@@ -11,11 +11,6 @@ def shuffleList( l ):
 
     return l
 
-def shuffleList2( l ):
-    l2 = l[:]
-    for i in range(len(l)-1,0,-1): j = random.randint(0,i); l2[i],l2[j]=l2[j],l2[i]
-    return l2
-
 print( shuffleList(["apple", "blackberry", "cherry", "dragonfruit", "grapefruit", "kumquat", "mango", "nectarine", "persimmon", "raspberry", "raspberry"]) )
 print( shuffleList(["a", "e", "i", "o", "u"]) )
 
