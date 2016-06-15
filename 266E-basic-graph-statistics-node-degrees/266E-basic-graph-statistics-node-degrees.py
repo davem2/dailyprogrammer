@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import fileinput
+import collections
+
 
 def main():
 
     lines = [line.rstrip() for line in fileinput.input()]
     count = int(lines[0])
-    degree = [0 for n in range(count)]
+    degree = collections.defaultdict(int)
     for line in lines[1:]:
         for node in line.split():
-            degree[int(node)-1] += 1
+            degree[node] += 1
 
-    for i, d in enumerate(degree):
-        print("Node {} has a degree of {}".format(i+1,d))
+    for k in sorted(degree, key=int):
+        print("Node {} has a degree of {}".format(k,degree[k]))
 
 
 if __name__ == "__main__":
