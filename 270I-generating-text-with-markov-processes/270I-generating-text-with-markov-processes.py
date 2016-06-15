@@ -8,7 +8,7 @@ import random
 def gen_text(text,prefixSize):
     suffixMap = gen_suffix_map(text,prefixSize)
 
-    newText = []
+    newWords = []
     words = text.split()
     x = random.choice(range(len(words)-prefixSize))
     p = words[x:x+prefixSize]
