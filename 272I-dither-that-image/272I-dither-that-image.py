@@ -141,7 +141,7 @@ def main():
     for i in range(len(matrices)):
         print(matrices[i])
         im = DitherColor(Image.open("test3.jpg"),matrices[i][2],denom=matrices[i][1])
-        im.show()
+        im.save("{}.png".format(matrices[i][0]),"png")
 
 
 
