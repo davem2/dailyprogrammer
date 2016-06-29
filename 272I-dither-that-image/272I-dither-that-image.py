@@ -5,7 +5,7 @@ from PIL import Image
 from array import array
 
 def NoDither(filename):
-    im = Image.open("testbw.jpg")
+    im = Image.open(filename)
     px = im.load()
     w, h = im.size
 
@@ -21,7 +21,7 @@ def NoDither(filename):
 
 
 def OneDimensionalErrorDiffusionDithering(filename):
-    im = Image.open("testbw.jpg")
+    im = Image.open(filename)
     px = im.load()
     w, h = im.size
 
@@ -40,303 +40,33 @@ def OneDimensionalErrorDiffusionDithering(filename):
     return im
 
 
-def FloydSteinbergDithering(filename):
-    im = Image.open("testbw.jpg")
+
+
+matrices = (
+    ('FloydSteinberg',16,
+        [(1,0,7),(-1,1,3),(0,1,5),(1,1,1)]),
+    ('JarvisJudiceNinke',48,
+        [(1,0,7),(2,0,5),(-2,1,3),(-1,1,5),(0,1,7),(1,1,5),(2,1,3),(-2,2,1),(-1,2,3),(0,2,5),(1,2,3),(2,2,1)]),
+    ('Stucki',42,
+        [(1,0,8),(2,0,4),(-2,1,2),(-1,1,4),(0,1,8),(1,1,4),(2,1,2),(-2,2,1),(-1,2,2),(0,2,4),(1,2,2),(2,2,1)]),
+    ('Atkinson',8,
+        [(1,0,1),(2,0,1),(-1,1,1),(0,1,1),(1,1,1),(0,2,1)]),
+    ('Burkes',32,
+        [(1,0,8),(2,0,4),(-2,1,2),(-1,1,4),(0,1,8),(1,1,4),(2,1,2)]),
+    ('Sierra',32,
+        [(1,0,5),(2,0,3),(-2,1,2),(-1,1,4),(0,1,5),(1,1,4),(2,1,2),(-1,2,2),(0,2,3),(2,2,2)]),
+    ('TwoRowSierra',16,
+        [(1,0,4),(2,0,3),(-2,1,1),(-1,1,2),(0,1,3),(1,1,2),(2,1,1)]),
+    ('SierraLite',4,
+        [(1,0,2),(-1,1,1),(0,1,1)])
+)
+
+
+def DitherBW(im,matrix,denom=None):
     px = im.load()
     w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            sixteenth = error / 16.0
-            try:
-                px[x+1,y] += int(sixteenth * 7)
-                px[x-1,y+1] += int(sixteenth * 3)
-                px[x,y+1] += int(sixteenth * 5)
-                px[x+1,y+1] += int(sixteenth * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def JarvisJudiceNinkeDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            fourtyeigth = error / 48.0
-            try:
-                px[x+1,y] += int(fourtyeigth * 7)
-                px[x+2,y] += int(fourtyeigth * 5)
-                px[x-2,y+1] += int(fourtyeigth * 3)
-                px[x-1,y+1] += int(fourtyeigth * 5)
-                px[x,y+1] += int(fourtyeigth * 7)
-                px[x+1,y+1] += int(fourtyeigth * 5)
-                px[x+2,y+1] += int(fourtyeigth * 3)
-                px[x-2,y+2] += int(fourtyeigth * 1)
-                px[x-1,y+2] += int(fourtyeigth * 3)
-                px[x,y+2] += int(fourtyeigth * 5)
-                px[x+1,y+2] += int(fourtyeigth * 3)
-                px[x+2,y+2] += int(fourtyeigth * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def StuckiDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            fourtysecond = error / 42.0
-            try:
-                px[x+1,y] += int(fourtysecond * 8)
-                px[x+2,y] += int(fourtysecond * 4)
-                px[x-2,y+1] += int(fourtysecond * 2)
-                px[x-1,y+1] += int(fourtysecond * 4)
-                px[x,y+1] += int(fourtysecond * 8)
-                px[x+1,y+1] += int(fourtysecond * 4)
-                px[x+2,y+1] += int(fourtysecond * 2)
-                px[x-2,y+2] += int(fourtysecond * 1)
-                px[x-1,y+2] += int(fourtysecond * 2)
-                px[x,y+2] += int(fourtysecond * 4)
-                px[x+1,y+2] += int(fourtysecond * 2)
-                px[x+2,y+2] += int(fourtysecond * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def AtkinsonDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            eigth = error / 8.0
-            try:
-                px[x+1,y] += int(eigth * 1)
-                px[x+2,y] += int(eigth * 1)
-                px[x-1,y+1] += int(eigth * 1)
-                px[x,y+1] += int(eigth * 1)
-                px[x+1,y+1] += int(eigth * 1)
-                px[x,y+2] += int(eigth * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def BurkesDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            thirtysecond = error / 32.0
-            try:
-                px[x+1,y] += int(thirtysecond * 8)
-                px[x+2,y] += int(thirtysecond * 4)
-                px[x-2,y+1] += int(thirtysecond * 2)
-                px[x-1,y+1] += int(thirtysecond * 4)
-                px[x,y+1] += int(thirtysecond * 8)
-                px[x+1,y+1] += int(thirtysecond * 4)
-                px[x+2,y+1] += int(thirtysecond * 2)
-            except IndexError:
-                pass
-
-    return im
-
-
-def SierraDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            thirtysecond = error / 32.0
-            try:
-                px[x+1,y] += int(thirtysecond * 5)
-                px[x+2,y] += int(thirtysecond * 3)
-                px[x-2,y+1] += int(thirtysecond * 2)
-                px[x-1,y+1] += int(thirtysecond * 4)
-                px[x,y+1] += int(thirtysecond * 5)
-                px[x+1,y+1] += int(thirtysecond * 4)
-                px[x+2,y+1] += int(thirtysecond * 2)
-                px[x-1,y+2] += int(thirtysecond * 2)
-                px[x,y+2] += int(thirtysecond * 3)
-                px[x+2,y+2] += int(thirtysecond * 2)
-            except IndexError:
-                pass
-
-    return im
-
-
-def TwoRowSierraDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            sixteenth = error / 16.0
-            try:
-                px[x+1,y] += int(sixteenth * 4)
-                px[x+2,y] += int(sixteenth * 3)
-                px[x-2,y+1] += int(sixteenth * 1)
-                px[x-1,y+1] += int(sixteenth * 2)
-                px[x,y+1] += int(sixteenth * 3)
-                px[x+1,y+1] += int(sixteenth * 2)
-                px[x+2,y+1] += int(sixteenth * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def SierraLiteDithering(filename):
-    im = Image.open("testbw.jpg")
-    px = im.load()
-    w, h = im.size
-
-    forwardArray = [0*w]
-
-    for y in range(h):
-        error = 0
-        for x in range(w):
-            p = px[x,y]
-            v = p
-
-            if v < 128:
-                px[x,y] = 0
-                error = v
-            else:
-                px[x,y] = 255
-                error = -(255 - v)
-
-            # Spread error to surrounding pixels
-            fourth = error / 4.0
-            try:
-                px[x+1,y] += int(fourth * 2)
-                px[x-1,y+1] += int(fourth * 1)
-                px[x,y+1] += int(fourth * 1)
-            except IndexError:
-                pass
-
-    return im
-
-
-def DitherBW(im,matrix):
-    px = im.load()
-    w, h = im.size
-    denom = sum([m[2] for m in matrix])
+    if not denom:
+        denom = sum([m[2] for m in matrix])
 
     for y in range(h):
         error = 0
@@ -362,10 +92,11 @@ def DitherBW(im,matrix):
     return im
 
 
-def DitherColor(im,matrix):
+def DitherColor(im,matrix,denom=None):
     px = im.load()
     w, h = im.size
-    denom = sum([m[2] for m in matrix])
+    if not denom:
+        denom = sum([m[2] for m in matrix])
 
     for y in range(h):
         error = 0
@@ -378,12 +109,12 @@ def DitherColor(im,matrix):
                 if p[c] < 64:
                     cv[c] = 0
                     error = p[c]
-                elif p[c] < 192:
-                    cv[c] = 128
-                    error = -(128 - p[c])
-                else:
+                elif p[c] > 196:
                     cv[c] = 255
                     error = -(255 - p[c])
+                else:
+                    cv[c] = 128
+                    error = -(128 - p[c])
 
                 px[x,y] = tuple(cv)
 
@@ -402,50 +133,16 @@ def DitherColor(im,matrix):
 
 def main():
 
+    #for i in range(len(matrices)):
+    #    print(matrices[i])
+    #    im = DitherBW(Image.open("testbw.jpg"),matrices[i][2],denom=matrices[i][1])
+    #    im.show()
 
-    im = Image.open("testbw.jpg")
-    #im.show()
-    im = DitherBW(im,[(1,0,2),(-1,1,1),(0,1,1)])
-    im.show()
-    #im2 = Image.open("test3.jpg")
-    #px = array.frombytes(im2.getdata())
-    #im3 = Image.fromarray(px)
-    #im3.show()
+    for i in range(len(matrices)):
+        print(matrices[i])
+        im = DitherColor(Image.open("test3.jpg"),matrices[i][2],denom=matrices[i][1])
+        im.show()
 
-    im = Image.open("test.jpg")
-    im = DitherColor(im,[(1,0,4),(-1,1,1),(0,1,2),(1,1,1)])
-    im.show()
-
-
-    im = NoDither("testbw.jpg")
-    im.show()
-
-    im = OneDimensionalErrorDiffusionDithering("testbw.jpg")
-    im.show()
-
-    im = FloydSteinbergDithering("testbw.jpg")
-    im.show()
-
-    im = JarvisJudiceNinkeDithering("testbw.jpg")
-    im.show()
-
-    im = StuckiDithering("testbw.jpg")
-    im.show()
-
-    im = AtkinsonDithering("testbw.jpg")
-    im.show()
-
-    im = BurkesDithering("testbw.jpg")
-    im.show()
-
-    im = SierraDithering("testbw.jpg")
-    im.show()
-
-    im = TwoRowSierraDithering("testbw.jpg")
-    im.show()
-
-    im = SierraLiteDithering("testbw.jpg")
-    im.show()
 
 
 if __name__ == "__main__":
