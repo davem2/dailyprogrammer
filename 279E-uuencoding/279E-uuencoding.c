@@ -25,12 +25,12 @@ void uuencode( char *fileName )
     long unencodedByteLen = fsize(fileName);
     long encodedByteLen = unencodedByteLen + (unencodedByteLen / 3.0);
 
-    printf("%d, %d\n", unencodedByteLen, encodedByteLen);
+    //printf("%d, %d\n", unencodedByteLen, encodedByteLen);
 
     int linecount = unencodedByteLen / 45;
     int lastlinelen = unencodedByteLen % 45;
 
-    printf("%d, %d\n", linecount, lastlinelen);
+    //printf("%d, %d\n", linecount, lastlinelen);
 
     FILE *f = fopen(fileName,"rb");
     unsigned char inbuf[3];
